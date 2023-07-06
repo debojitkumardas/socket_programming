@@ -1,3 +1,3 @@
-# socket_programming
+# Socket Programming
 
-- This repository contains programs that uses the UNIX socket API to create some interesting programs.
+- This repository contains programs that uses the socket API in linux to create some interesting programs.
