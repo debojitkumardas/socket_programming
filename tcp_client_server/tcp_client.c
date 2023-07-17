@@ -25,8 +25,10 @@ int main(void) {
         perror("Connect failed.\n");
         exit(-1);
     }
-    else
+    else {
         printf("Connect successful. The return value is: %d\n", ret_val_connect);
+        printf("Also the return value of socket is: %d\n", socket_client_node);
+    }
 
     // receiving response from server
     char response[256];
