@@ -1,7 +1,5 @@
 #include "utility_func.h"
-#include <netinet/in.h>
 #include <stdio.h>
-#include <unistd.h>
 
 int main(void) {
 

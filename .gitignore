@@ -1,0 +1,4 @@
+# ignore the object files
+*.o
+# ignore the .d files
+*.d

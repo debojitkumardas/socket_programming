@@ -136,3 +136,17 @@ void close_server(int server_socket) {
 
     close(server_socket);
 }
+
+int get_message(char text[], int len) {
+
+    int c, i = 0;
+
+    printf("Please enter the message.\n");
+
+    for (i = 0; (i < len-1) && ((c = getchar()) != EOF); ++i)
+        text[i] = c;
+
+    text[i] = '\0';  // mark the end of string
+
+    return i;  // return the number of bytes written
+}

@@ -18,7 +18,11 @@ int main(void) {
     // accepting the connection
     int accept_ret = accept_connection(server_socket);
 
-    char msg[1024] = "Welcome to the server!!!\n";
+    char msg[1024];
+
+    int msg_ret = get_message(msg, sizeof(msg));
+
+    printf("%d bytes in the message.\n", msg_ret);
 
     int send_ret = send_msg(accept_ret, msg, sizeof(msg));
 

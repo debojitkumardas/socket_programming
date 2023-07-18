@@ -14,4 +14,6 @@ int send_msg(int client_socket, char *text, unsigned len);
 int recv_msg(int client_socket, char *text, unsigned len);
 void close_server(int server_socket);
 
+int get_message(char text[], int len);
+
 #endif // !UTILITY_FUNC_H
