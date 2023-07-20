@@ -1,4 +1,4 @@
-CC=gcc
+CC=clang
 DEPFLAGS=-MP -MD
 CFLAGS=-Wall -Werror -Wextra -g -I . $(DEFFLAGS)
 

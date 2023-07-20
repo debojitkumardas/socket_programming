@@ -3,33 +3,24 @@
 
 int main(void) {
 
-    int server_socket = get_socket();  // assign an endpoint to server
+    int socket_FD = get_socket(AF_INET, SOCK_STREAM);
 
-    // assign IP and port to that server
-    struct sockaddr_in server_addr;
-    get_IP_port(&server_addr, 9002);
+    struct sockaddr_in node;
+    get_IP_port(&node, 9002);
 
-    // bind server to an IP and port
-    bind_server(server_socket, &server_addr, sizeof(server_addr));
+    bind_server(socket_FD, &node, sizeof(node));
 
-    // listen for any connection
-    listen_server(server_socket, 5);
+    listen_server(socket_FD, 5);
 
-    // accepting the connection
-    int accept_ret = accept_connection(server_socket);
+    int accept_ret = accept_connection(socket_FD);
 
-    char msg[1024];
-
-    int msg_ret = get_message(msg, sizeof(msg));
-
-    printf("%d bytes in the message.\n", msg_ret);
+    char msg[1024] = "Hello, welcome to the server!!\n";
 
     int send_ret = send_msg(accept_ret, msg, sizeof(msg));
 
-    printf("%d bytes of data send.\n", send_ret);
+    printf("%d bytes send.\n", send_ret);
 
-    // closing the connection
-    close_server(server_socket);
+    close_server(socket_FD);
 
     return 0;
 }

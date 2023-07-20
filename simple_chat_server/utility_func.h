@@ -4,7 +4,7 @@
 #include <netinet/in.h>
 
 void error_hand(char text[], const int ret_val);
-int get_socket();
+int get_socket(int domain, int type);
 void get_IP_port(struct sockaddr_in *server_addr, unsigned port);
 void bind_server(int server_socket, struct sockaddr_in *server_addr, unsigned len);
 void listen_server(unsigned const server_socket, unsigned const backlog);

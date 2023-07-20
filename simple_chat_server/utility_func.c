@@ -46,14 +46,14 @@ void error_hand(char text[], const int ret_val) {
     free(text_new);
 }
 
-int get_socket() {
+int get_socket(int domain, int type) {
 
-    const int server_socket = socket(AF_INET, SOCK_STREAM, 0);  // assign an endpoint to server
+    const int socket_FD = socket(domain, type, 0);  // assign an endpoint to server
 
     // if socket assignment fails
-    error_hand("Socket assignment", server_socket);
+    error_hand("Socket assignment", socket_FD);
 
-    return server_socket;
+    return socket_FD; // return the file descriptor
 }
 
 void get_IP_port(struct sockaddr_in *server_addr, unsigned port) {
@@ -139,10 +139,11 @@ void close_server(int server_socket) {
 
 int get_message(char text[], int len) {
 
-    int c, i = 0;
+    int c, i;
 
     printf("Please enter the message.\n");
 
+    c = 0;
     for (i = 0; (i < len-1) && ((c = getchar()) != EOF); ++i)
         text[i] = c;
 

@@ -3,31 +3,26 @@
 
 int main(void) {
 
-    int client_socket = get_socket();  // assigning an endpoint for client
+    int socket_FD = get_socket(AF_INET, SOCK_STREAM);
 
-    // assign IP and port
-    struct sockaddr_in client_addr;
-    get_IP_port(&client_addr, 9005);
+    // get Port and IP
+    struct sockaddr_in node;
+    get_IP_port(&node, 9005);
 
-    // where to connect to
-    struct sockaddr_in server_addr;
-    get_IP_port(&server_addr, 9002);
+    bind_server(socket_FD, &node, sizeof(node));
 
-    // bind the socket to IP and port
-    bind_server(client_socket, &client_addr, sizeof(client_addr));
+    // to connect to
+    struct sockaddr_in node_con;
+    get_IP_port(&node, 9002);
 
-    // connet to server
-    connect_to_server(client_socket, &server_addr, sizeof(server_addr));
+    connect_to_server(socket_FD, &node_con, sizeof(node_con));
 
-    // response
     char msg[1024];
 
-    int recv_ret = recv_msg(client_socket, msg, sizeof(msg));
+    int recv_ret = recv_msg(socket_FD, msg, sizeof(msg));
 
-    printf("The response is: %s\n", msg);
-    printf("The number of bytes received: %d\n", recv_ret);
-
-    close_server(client_socket);
+    printf("Response received: %s\n", msg);
+    printf("%d bytes received.\n", recv_ret);
 
     return 0;
 }
