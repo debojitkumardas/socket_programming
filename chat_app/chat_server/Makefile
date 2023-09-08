@@ -1,5 +1,6 @@
-SRC_DIR=src
-BIN_DIR=bin
+SRC_DIR = src/
+HDR_DIR = hdr/
+BIN_DIR = bin/
 
 CXX=g++
 DEPFLAGS=-MP -MD
@@ -8,8 +9,9 @@ LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-network
 
 SRC=$(wildcard $(SRC_DIR)/*.cpp)
 HDR=$(patsubst %.cpp, $(BIN_DIR)/%.d, $(notdir $(SRC)))
-OBJ=$(patsubst %.cpp, $(BIN_DIR)/%.o, $(notdir $(SRC)))
 BIN=$(BIN_DIR)/server
+
+OBJ=$(patsubst %.cpp, $(BIN_DIR)/%.o, $(notdir $(SRC)))
 
 all: $(BIN)
 
