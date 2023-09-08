@@ -1,28 +1,58 @@
 #include "utility_func.h"
 #include <stdio.h>
+#include <string.h>
 
 int main(void) {
 
-    int socket_FD = get_socket(AF_INET, SOCK_STREAM);
+    int client_socket_FD = GetSocket(AF_INET, SOCK_STREAM);
 
     // get Port and IP
-    struct sockaddr_in node;
-    get_IP_port(&node, 9005);
+    // struct sockaddr_in node;
+    // GetIPPort(&node, 9005);
 
-    bind_server(socket_FD, &node, sizeof(node));
+    // BindServer(socket_FD, &node, sizeof(node));
 
-    // to connect to
-    struct sockaddr_in node_con;
-    get_IP_port(&node, 9002);
+    // connect to server @Port
+    struct sockaddr_in server_node;
+    GetIPPort(&server_node, 9002);
 
-    connect_to_server(socket_FD, &node_con, sizeof(node_con));
+    ConnectToServer(client_socket_FD, &server_node, sizeof(server_node));
 
     char msg[1024];
 
-    int recv_ret = recv_msg(socket_FD, msg, sizeof(msg));
+    int recv_ret = RecvMsg(client_socket_FD, msg, sizeof(msg));
 
     printf("Response received: %s\n", msg);
     printf("%d bytes received.\n", recv_ret);
+
+    printf("Start chatting, type exit to exit.\n");
+    while (1) {
+        int ch;
+        int i = 0;
+
+        printf("Message: ");
+        while ((ch = getchar()) != EOF && (ch != '\n')) {
+            if (i < 1024) {
+                msg[i] = ch;
+            }
+            else
+                break;
+            ++i;
+        }
+
+        if (i > 0) {
+            if (i < 1024)
+                msg[i] = '\0';
+
+            if (strcmp(msg, "exit") == 0) {
+                printf("Exiting!!\n");
+                break;
+            }
+
+            int send_ret = SendMsg(client_socket_FD, msg, sizeof(msg));
+            printf("Message sent. %d bytes sent.\n\n", send_ret);
+        }
+    }
 
     return 0;
 }

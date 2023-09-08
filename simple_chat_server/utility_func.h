@@ -3,17 +3,29 @@
 
 #include <netinet/in.h>
 
-void error_hand(char text[], const int ret_val);
-int get_socket(int domain, int type);
-void get_IP_port(struct sockaddr_in *server_addr, unsigned port);
-void bind_server(int server_socket, struct sockaddr_in *server_addr, unsigned len);
-void listen_server(unsigned const server_socket, unsigned const backlog);
-int accept_connection(int server_socket);
-void connect_to_server(int server_socket, struct sockaddr_in *server_addr, unsigned len);
-int send_msg(int client_socket, char *text, unsigned len);
-int recv_msg(int client_socket, char *text, unsigned len);
-void close_server(int server_socket);
+typedef struct ClientServers ClientServers;
 
-int get_message(char text[], int len);
+struct ClientServers {
+    int client_socket_FD;
+    struct sockaddr_in address;
+    int error;
+    int flag;  // yes (succes) or no (failed)
+};
+
+/** To handle error */
+void ErrorHand(char text[], const int ret_val);
+/** Get socket file descriptor */
+int GetSocket(int domain, int type);
+void GetIPPort(struct sockaddr_in *server_addr, unsigned port);
+void BindServer(int server_socket, struct sockaddr_in *server_addr, unsigned short len);
+void ListenServer(unsigned const server_socket, unsigned const backlog);
+int AcceptConnection(int server_socket);
+ClientServers* AcceptConnection_n(int server_socket);
+void ConnectToServer(int server_socket, struct sockaddr_in *server_addr, unsigned len);
+int SendMsg(int client_socket, char *text, unsigned len);
+int RecvMsg(int client_socket, char *text, unsigned len);
+void CloseServer(int server_socket);
+
+int GetMessage(char text[], int len);
 
 #endif // !UTILITY_FUNC_H

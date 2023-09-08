@@ -7,56 +7,31 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <errno.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
-void error_hand(char text[], const int ret_val) {
-
-    // basic text manipulation **********************************************************
-    char ch[] = " failed";
-    char *temp = text;
-    int len = 0, sz = strlen(ch);
-
-    while (*temp != '\0') {
-        len++;
-        temp++;
-    }
-
-    char *text_old = malloc(sizeof(char) * (len + 1));
-    char *text_new = malloc(sizeof(char) * (len + sz + 1));
-
-    temp = text;
-    int i = 0;
-    while (*temp != '\0') {
-        text_old[i] = *temp;
-        text_new[i] = *temp;
-        i++;
-        temp++;
-    }
-
-    strcat(text_new, " failed");
-    // basic text manipulation end ******************************************************
-
+void ErrorHand(char text[], const int ret_val) {
     if (ret_val == -1) {
-        perror(text_new);
+        printf("%s failed\n", text);
         exit(1);
     }
+    /*
     else
-        printf("%s successful.\n The return value is: %d\n",text_old, ret_val);
-
-    free(text_old);
-    free(text_new);
+        printf("%s successful.\n The return value is: %d\n", text, ret_val);
+    */
 }
 
-int get_socket(int domain, int type) {
+int GetSocket(int domain, int type) {
 
-    const int socket_FD = socket(domain, type, 0);  // assign an endpoint to server
+    const int socket_FD = socket(domain, type, 0);  // assign an endpoint to server; 0 -> use IP layer
 
     // if socket assignment fails
-    error_hand("Socket assignment", socket_FD);
+    ErrorHand("Socket assignment", socket_FD);
 
     return socket_FD; // return the file descriptor
 }
 
-void get_IP_port(struct sockaddr_in *server_addr, unsigned port) {
+void GetIPPort(struct sockaddr_in *server_addr, unsigned port) {
 
     (*server_addr).sin_family = AF_INET;
     (*server_addr).sin_port = htons(port);
@@ -64,80 +39,109 @@ void get_IP_port(struct sockaddr_in *server_addr, unsigned port) {
     bzero(&((*server_addr).sin_zero), sizeof((*server_addr).sin_zero));
 }
 
-void bind_server(int server_socket, struct sockaddr_in *server_addr, unsigned len) {
+void BindServer(int server_socket, struct sockaddr_in *server_addr, unsigned short len) {
 
     // bind the server to the IP and port
     const int bind_ret = bind(server_socket, (struct sockaddr *)server_addr, len);
 
     // if bind fails
-    error_hand("Bind", bind_ret);
+    ErrorHand("Bind", bind_ret);
 }
 
-void listen_server(unsigned const server_socket, unsigned const backlog) {
+void ListenServer(unsigned const server_socket, unsigned const backlog) {
 
     const int listen_ret = listen(server_socket, backlog);
 
     // if listen fails
-    error_hand("Listen", listen_ret);
+    ErrorHand("Listen", listen_ret);
 }
 
-int accept_connection(int server_socket) {
+int AcceptConnection(int server_socket) {
 
     // to log client's info
     struct sockaddr_in client_addr;
     unsigned int size_client_addr = sizeof(client_addr);
 
-    int accept_ret = accept(server_socket, (struct sockaddr *)&client_addr, &size_client_addr);
+    int client_socket_FD = accept(server_socket, (struct sockaddr*)&client_addr, &size_client_addr);
 
     // if accept fails
-    error_hand("Accept", accept_ret);
+    ErrorHand("Accept", client_socket_FD);
 
     // client details
+    size_t len = sizeof(client_addr);
+    char* ip = malloc(len * sizeof(char));
+    inet_ntop(AF_INET, &(client_addr.sin_addr.s_addr), ip, len);
+
     printf(
         "Client's server details.\n"
         "sin_family: %d\n"
         "sin_port: %d\n"
-        "sin_addr.s_addr: %d\n",
-        client_addr.sin_family, ntohs(client_addr.sin_port), client_addr.sin_addr.s_addr
+        "sin_addr.s_addr: %s\n",
+        client_addr.sin_family, ntohs(client_addr.sin_port), ip
     );
 
-    return accept_ret;
+    free(ip);
+
+    return client_socket_FD;
 }
 
-void connect_to_server(int server_socket, struct sockaddr_in *server_addr, unsigned len) {
+ClientServers* AcceptConnection_n(int server_socket) {
+    struct sockaddr_in client_addr;
+    unsigned int size_client_addr = sizeof(client_addr);
+
+    int client_socket_FD = accept(server_socket, (struct sockaddr*)&client_addr, &size_client_addr);
+
+    ClientServers* client_details = malloc(sizeof(ClientServers));
+
+    client_details->address = client_addr;
+    client_details->client_socket_FD = client_socket_FD;
+
+    if (client_socket_FD > 0) {
+        client_details->flag = 1;
+        client_details->error = 0;
+    }
+    else {
+        client_details->flag = 0;
+        client_details->error = client_socket_FD;
+    }
+
+    return client_details;
+}
+
+void ConnectToServer(int server_socket, struct sockaddr_in *server_addr, unsigned len) {
 
     int connect_ret = connect(server_socket, (struct sockaddr *)server_addr, len);
 
     // if connect fails
-    error_hand("Connect", connect_ret);
+    ErrorHand("Connect", connect_ret);
 }
 
-int send_msg(int client_socket, char *text, unsigned len) {
+int SendMsg(int client_socket, char *text, unsigned len) {
 
     int send_ret = send(client_socket, text, len, 0);
 
     // if message not sent
-    error_hand("Send", send_ret);
+    ErrorHand("Send", send_ret);
 
     return send_ret;
 }
 
-int recv_msg(int client_socket, char *text, unsigned len) {
+int RecvMsg(int client_socket, char *text, unsigned len) {
 
     int recv_ret = recv(client_socket, text, len, 0);
 
     // if receive fails
-    error_hand("Receive", recv_ret);
+    ErrorHand("Receive", recv_ret);
 
     return recv_ret;
 }
 
-void close_server(int server_socket) {
+void CloseServer(int server_socket) {
 
     close(server_socket);
 }
 
-int get_message(char text[], int len) {
+int GetMessage(char text[], int len) {
 
     int c, i;
 

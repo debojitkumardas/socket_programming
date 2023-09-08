@@ -1,6 +1,7 @@
 CC=clang
 DEPFLAGS=-MP -MD
-CFLAGS=-Wall -Werror -Wextra -g -I . $(DEFFLAGS)
+CFLAGS=-Wall -Werror -Wextra -I . $(DEFFLAGS)
+LIBS=-static-libsan
 
 SRC=$(wildcard *.c)
 HDR=$(patsubst %.c, %.d, $(SRC))
@@ -8,6 +9,9 @@ OBJ=$(patsubst %.c, %.o, $(SRC))
 BIN=tcp_client tcp_server
 
 all: $(BIN)
+
+debug: CFLAGS += -fsanitize=address $(LIBS) -DDEBUG -ggdb
+debug: $(BIN)
 
 tcp_server: $(filter-out tcp_client.o, $(OBJ))
 	$(CC) $(CFLAGS) -o $@ $^
