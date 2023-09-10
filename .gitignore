@@ -5,5 +5,6 @@
 # ignore the compile_commands.json
 compile_commands.json
 
-# ignore all files in the bin dir
+# ignore all files in the bin and .cache dir
 bin/
+.cache/
