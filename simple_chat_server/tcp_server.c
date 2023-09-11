@@ -1,6 +1,7 @@
 #include "utility_func.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 int main(void) {
 
@@ -35,7 +36,7 @@ int main(void) {
     CloseServer(client_socket_FD);
     */
 
-    ClientServers* client_details = AcceptConnection_n(server_socket_FD);
+    ClientServers* client_details = AcceptConnectionN(server_socket_FD);
 
     char msg[1024] = "Hello, welcome to the server!!\n";
 

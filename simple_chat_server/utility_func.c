@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 void ErrorHand(char text[], const int ret_val) {
     if (ret_val == -1) {
@@ -85,7 +86,7 @@ int AcceptConnection(int server_socket) {
     return client_socket_FD;
 }
 
-ClientServers* AcceptConnection_n(int server_socket) {
+ClientServers* AcceptConnectionN(int server_socket) {
     struct sockaddr_in client_addr;
     unsigned int size_client_addr = sizeof(client_addr);
 
@@ -141,17 +142,11 @@ void CloseServer(int server_socket) {
     close(server_socket);
 }
 
-int GetMessage(char text[], int len) {
+void AcceptConnectionNUtil(int server_socket) {
+    ClientServers* client_details = AcceptConnectionN(server_socket);
+}
 
-    int c, i;
-
-    printf("Please enter the message.\n");
-
-    c = 0;
-    for (i = 0; (i < len-1) && ((c = getchar()) != EOF); ++i)
-        text[i] = c;
-
-    text[i] = '\0';  // mark the end of string
-
-    return i;  // return the number of bytes written
+void AcceptIncomingConnection(int server_socket_FD) {
+    pthread_t id;
+    pthread_create(&id, NULL, AcceptConnectionNUtil, server_socket_FD);
 }
